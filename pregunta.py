@@ -22,5 +22,6 @@ def clean_data():
     df.comuna_ciudadano = df.comuna_ciudadano.astype("float")
     df.fecha_de_beneficio = pd.to_datetime(df.fecha_de_beneficio,infer_datetime_format=True,errors='coerce',dayfirst=True)
     df.fecha_de_beneficio = df.fecha_de_beneficio.dt.strftime("%Y/%m/%d")
+    df.fecha_de_beneficio = pd.to_datetime(df.fecha_de_beneficio)
     df.drop_duplicates(inplace = True)
     return df
