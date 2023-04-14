@@ -7,31 +7,29 @@ correctamente. Tenga en cuenta datos faltantes y duplicados.
 
 """
 import pandas as pd
-
+from datetime import datetime
 
 def clean_data():
-
     df = pd.read_csv("solicitudes_credito.csv", sep=";")
-    df.dropna(axis = 0, inplace = True)
-    df.drop_duplicates(inplace = True)
-    df=df.drop(['Unnamed: 0'], axis=1)
-    df[["sexo", "tipo_de_emprendimiento","idea_negocio","barrio","línea_credito"]]=df[["sexo", "tipo_de_emprendimiento","idea_negocio","barrio","línea_credito"]].apply(lambda x: x.astype(str).str.lower())
-    df=df.replace(to_replace="(_)|(-)",value=" ",regex=True)    
-    df=df.replace(to_replace="[,$]|(\.00$)",value="",regex=True)
-    df.monto_del_credito = df.monto_del_credito.astype("int")
-    df.comuna_ciudadano = df.comuna_ciudadano.astype("float")
-    df.fecha_de_beneficio = pd.to_datetime(df.fecha_de_beneficio,infer_datetime_format=True,errors='ignore',dayfirst=True)
-    df.fecha_de_beneficio = df.fecha_de_beneficio.dt.strftime("%Y/%m/%d")
-    # df.fecha_de_beneficio = pd.to_datetime(df.fecha_de_beneficio)
-    df.drop_duplicates(inplace = True)
-
-    df = pd.DataFrame({"sexo": ["femenino"]*6767 + ["masculino"]*3650,
-    "tipo_de_emprendimiento": None,
-    "idea_negocio": None,
-    "barrio": None,
-    "estrato": [0]*4 + [1]*2062 + [2]*5132 + [3]*3219,
-    "comuna_ciudadano": None,
-    "fecha_de_beneficio": None,
-    "monto_del_credito": None,
-    "línea_credito": None})    
+    df.drop(df.columns[0], axis=1, inplace=True)
+    df['monto_del_credito'] = df['monto_del_credito'].str.replace('[\$,]', '', regex=True)
+    df["monto_del_credito"] = df["monto_del_credito"].astype(str).str.split(".", expand=True)[0]
+    df['idea_negocio'] = df['idea_negocio'].str.replace('-', ' ')
+    df['línea_credito'] = df['línea_credito'].str.replace('-', ' ')
+    df['barrio'] = df['barrio'].str.replace('-', ' ')
+    df['idea_negocio'] = df['idea_negocio'].str.replace('_', ' ')
+    df['línea_credito'] = df['línea_credito'].str.replace('_', ' ')
+    df['barrio'] = df['barrio'].str.replace('_', ' ')
+    def formato_fecha(date_str):
+        try:
+            date_obj = datetime.strptime(date_str, '%Y/%m/%d') 
+        except ValueError:
+            date_obj = datetime.strptime(date_str, '%d/%m/%Y')  
+            date_obj = datetime.strptime(date_obj.strftime('%Y/%m/%d'), '%Y/%m/%d')  
+        return date_obj
+    df['fecha_de_beneficio'] = df['fecha_de_beneficio'].apply(formato_fecha)
+    df = df.applymap(lambda x: x.lower() if type(x) == str else x)
+    df = df.apply(lambda x: x.str.strip() if x.name != 'barrio' and x.dtype == 'O' else x)
+    df = df.dropna()
+    df = df.drop_duplicates()
     return df
