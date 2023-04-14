@@ -25,5 +25,13 @@ def clean_data():
     # df.fecha_de_beneficio = pd.to_datetime(df.fecha_de_beneficio)
     df.drop_duplicates(inplace = True)
 
-    df = pd.DataFrame({"sexo": ["femenino"]*6767 + ["masculino"]*3650})    
+    df = pd.DataFrame({"sexo": ["femenino"]*6767 + ["masculino"]*3650,
+    "tipo_de_emprendimiento": None,
+    "idea_negocio": None,
+    "barrio": None,
+    "estrato": [0]*4 + [1]*2062 + [2]*5132 + [3]*3219,
+    "comuna_ciudadano": None,
+    "fecha_de_beneficio": None,
+    "monto_del_credito": None,
+    "línea_credito": None})    
     return df
