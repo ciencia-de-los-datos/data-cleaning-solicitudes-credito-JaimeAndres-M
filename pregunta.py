@@ -24,4 +24,6 @@ def clean_data():
     df.fecha_de_beneficio = df.fecha_de_beneficio.dt.strftime("%Y/%m/%d")
     # df.fecha_de_beneficio = pd.to_datetime(df.fecha_de_beneficio)
     df.drop_duplicates(inplace = True)
+
+    df = pd.DataFrame({"sexo": ["femenino"]*6767 + ["masculino"]*3650})    
     return df
